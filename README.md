@@ -4,20 +4,25 @@
 
 Built in two days as a working answer to a hiring team's fair observation that my resume showed no Revit API experience. This is what the gap looks like after 48 hours: Link IFC ingestion, `FilteredElementCollector` audits, transaction discipline, `ExternalEvent` thread marshaling, an MCP server, and an 11-assertion end-to-end suite that caught a real interoperability defect on its first run.
 
-```
-┌─────────────────┐   IFC over HTTP   ┌──────────────────────────────────────┐
-│ OpenStrate      │ ────────────────► │ Revit 2027                           │
-│ scan-to-BIM     │                   │  ┌────────────────────────────────┐  │
-│ pipeline        │   /ifc.json       │  │ OpenStrateBridge.dll           │  │
-│ (D455 capture → │ ────────────────► │  │  MiniHttpServer (loopback)     │  │
-│  PTv3/SAM3 seg →│   manifest =      │  │    ▼ ExternalEvent bridge      │  │
-│  pointcloud_to_ │   source of truth │  │  Revit UI thread               │  │
-│  ifc)           │                   │  │    FilteredElementCollector,   │  │
-└─────────────────┘                   │  │    Transactions, Link IFC      │  │
-        ▲                             │  └────────────────────────────────┘  │
-        │      MCP stdio proxy        └──────────────────────────────────────┘
-        │   (mcp-proxy/server.mjs)                    ▲
-        └── any MCP client (Claude, etc.) ────────────┘
+```mermaid
+flowchart LR
+    subgraph pipeline["OpenStrate scan-to-BIM pipeline"]
+        capture["D455 capture"] --> seg["PTv3 / SAM3 segmentation"] --> p2i["pointcloud_to_ifc"]
+        p2i --> ifc[("room.ifc /<br/>apartment.ifc")]
+        p2i --> manifest[("/ifc.json manifest<br/>= source of truth")]
+    end
+
+    subgraph revit["Revit 2027 process"]
+        http["MiniHttpServer<br/>(loopback :8090)"] -->|"ExternalEvent bridge<br/>(RevitDispatcher)"| ui["Revit UI thread"]
+        ui --> api["Revit API:<br/>Link IFC · FilteredElementCollector · Transactions"]
+    end
+
+    ifc -->|"GET /download"| http
+    manifest -->|"GET /ifc.json"| audit["Audit:<br/>manifest vs. ingested model"]
+    api --> audit
+
+    client["Any MCP client<br/>(Claude, Cursor, ...)"] <-->|"MCP over stdio"| proxy["mcp-proxy/server.mjs"]
+    proxy <-->|"HTTP tool calls"| http
 ```
 
 ## What it does
