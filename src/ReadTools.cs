@@ -104,19 +104,22 @@ public static class ReadTools
             unique_id = e.UniqueId,
             category = e.Category?.Name,
             name = e.Name,
+            // IFC-imported elements can carry DUPLICATE parameter display names
+            // (built-in vs shared): group and keep the first non-empty value.
             parameters = e.Parameters.Cast<Parameter>()
                 .Where(p => p.HasValue)
-                .OrderBy(p => p.Definition.Name)
+                .GroupBy(p => p.Definition.Name)
+                .OrderBy(g => g.Key)
                 .ToDictionary(
-                    p => p.Definition.Name,
-                    p => p.StorageType switch
+                    g => g.Key,
+                    g => g.Select(p => p.StorageType switch
                     {
                         StorageType.String => (object?)p.AsString(),
                         StorageType.Integer => p.AsInteger(),
                         StorageType.Double => p.AsDouble(),   // internal units (feet) -- documented
                         StorageType.ElementId => p.AsValueString(),
                         _ => p.AsValueString(),
-                    }),
+                    }).FirstOrDefault(v => v is not null)),
             units_note = "Double values are Revit internal units (feet).",
         };
     }
