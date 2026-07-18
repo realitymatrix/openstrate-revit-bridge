@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RevitAddIns>
+  <AddIn Type="Application">
+    <Name>OpenStrate Bridge Server</Name>
+    <Assembly>OpenStrateBridge\OpenStrateBridge.dll</Assembly>
+    <FullClassName>OpenStrateBridge.BridgeApplication</FullClassName>
+    <AddInId>9b5c4e32-1d60-4f43-ae7c-2a8b3c4d5e6f</AddInId>
+    <VendorId>OPST</VendorId>
+    <VendorDescription>Spacial Intelligence Labs / OpenStrate</VendorDescription>
+  </AddIn>
+  <AddIn Type="Command">
+    <Name>OpenStrate: Ingest Scan</Name>
+    <Description>Pull the latest scan-to-BIM IFC from the OpenStrate service and open it in Revit.</Description>
+    <Assembly>OpenStrateBridge\OpenStrateBridge.dll</Assembly>
+    <FullClassName>OpenStrateBridge.IngestCommand</FullClassName>
+    <AddInId>7f3a2c10-9b4e-4d21-8c5a-0e6f1a2b3c4d</AddInId>
+    <VendorId>OPST</VendorId>
+    <VendorDescription>Spacial Intelligence Labs / OpenStrate</VendorDescription>
+  </AddIn>
+  <AddIn Type="Command">
+    <Name>OpenStrate: Audit vs Manifest</Name>
+    <Description>Audit what Revit ingested against the OpenStrate pipeline's own element manifest (/ifc.json).</Description>
+    <Assembly>OpenStrateBridge\OpenStrateBridge.dll</Assembly>
+    <FullClassName>OpenStrateBridge.AuditCommand</FullClassName>
+    <AddInId>8a4b3d21-0c5f-4e32-9d6b-1f7a2b3c4d5e</AddInId>
+    <VendorId>OPST</VendorId>
+    <VendorDescription>Spacial Intelligence Labs / OpenStrate</VendorDescription>
+  </AddIn>
+</RevitAddIns>

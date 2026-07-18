@@ -1,0 +1,44 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <!-- Revit 2025/2026 host .NET 8; Revit 2027 hosts .NET 10 -->
+    <RevitVersion Condition="'$(RevitVersion)' == ''">2027</RevitVersion>
+    <TargetFramework Condition="'$(RevitVersion)' &gt;= '2027'">net10.0-windows</TargetFramework>
+    <TargetFramework Condition="'$(RevitVersion)' &lt; '2027'">net8.0-windows</TargetFramework>
+    <UseWPF>true</UseWPF>
+    <LangVersion>latest</LangVersion>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <AssemblyName>OpenStrateBridge</AssemblyName>
+    <RootNamespace>OpenStrateBridge</RootNamespace>
+    <!-- Revit hosts the process; never copy its assemblies next to ours -->
+    <CopyLocalLockFileAssemblies>false</CopyLocalLockFileAssemblies>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    <PlatformTarget>x64</PlatformTarget>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <RevitDir>C:\Program Files\Autodesk\Revit $(RevitVersion)</RevitDir>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Reference Include="RevitAPI">
+      <HintPath>$(RevitDir)\RevitAPI.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="RevitAPIUI">
+      <HintPath>$(RevitDir)\RevitAPIUI.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+  </ItemGroup>
+
+  <!-- Deploy: copy DLL + manifest into the Revit addins folder after build -->
+  <Target Name="DeployAddin" AfterTargets="Build">
+    <PropertyGroup>
+      <AddinDir>$(AppData)\Autodesk\Revit\Addins\$(RevitVersion)</AddinDir>
+    </PropertyGroup>
+    <Copy SourceFiles="$(TargetPath)" DestinationFolder="$(AddinDir)\OpenStrateBridge" />
+    <Copy SourceFiles="OpenStrateBridge.addin" DestinationFolder="$(AddinDir)" />
+  </Target>
+
+</Project>

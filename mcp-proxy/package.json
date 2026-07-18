@@ -1,0 +1,11 @@
+{
+  "name": "revit-bridge-mcp",
+  "version": "0.1.0",
+  "description": "MCP stdio proxy for the OpenStrate Revit Bridge: exposes a live Revit session's tools to any MCP client.",
+  "type": "module",
+  "main": "server.mjs",
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.0.0",
+    "zod": "^3.23.0"
+  }
+}
